@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.design.mode">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,6 +19,38 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--facebook相关-->
+        <activity
+            android:name=".sectionone.activity.FacebookActivity"
+            android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <meta-data android:name="com.facebook.sdk.AutoLogAppEventsEnabled"
+            android:value="true"/>
+
+        <provider android:authorities="com.facebook.app.FacebookContentProvider1897453197241506"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"/>
+
+        <!-- 通过Facebook邀请的用户 -->
+        <activity
+            android:name=".sectionone.activity.InviteFromFacebookActivity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+             >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="com.design.mode" />
+            </intent-filter>
+        </activity>
+
     </application>
+
 
 </manifest>

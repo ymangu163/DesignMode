@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">设计模式</string>
-
+    <string name="facebook_app_id">1897453197241506</string>
+    <string name="facebook_app_page">DesignMode-1900996163555928</string>
 
     <array name="main">
         <item>第一章：面向对象的六大原则</item>
@@ -8,6 +9,12 @@
         <item>Custom View</item>
         <item>Frame 实践</item>
 
+    </array>
+
+    <array name="facebook_array">
+        <item>facebook分享</item>
+        <item>facebook邀请</item>
+        <item>facebook評星</item>
     </array>
 
     <array name="ui_array">

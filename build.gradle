@@ -27,6 +27,6 @@ ext {
     compileSdkVersion = 25
     minSdkVersion = 15
     targetSdkVersion = 22
-
+    facebookLibVersion = '4.23.0'
     supportLibVersion = "25.3.1"
 }
