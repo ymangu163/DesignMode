@@ -50,6 +50,8 @@
             </intent-filter>
         </activity>
 
+        <meta-data android:name="YMANGU" android:value="${YMANGU}"/>
+
     </application>
 
 

@@ -57,17 +57,18 @@ public class FacebookActivity extends RecycleActivity {
 
     private void inviteFacebook() {
         AppInviteContent content = new AppInviteContent.Builder()
-                .setApplinkUrl("https://fb.me/1897497707237055" + "?referral=4324324" )
+//                .setApplinkUrl("https://fb.me/1897497707237055" + "?referral=4324324" )
+                .setApplinkUrl("https://fb.me/240673899792985?referral=2" )
                 .build();
         AppInviteDialog.show(this, content);
     }
 
-    private void likeFacebook(String fbId) {
+    private void likeFacebook(String url) {
         Intent intent;
         if (AppUtil.isAppInstalled(this, "com.facebook.katana")) {
-            intent =  new Intent(Intent.ACTION_VIEW, Uri.parse("fb://page/" + fbId));
+            intent =  new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href=" + url));
         } else {
-            intent =  new Intent(Intent.ACTION_VIEW, Uri.parse("https://m.facebook.com/" + fbId));
+            intent =  new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         }
         startActivity(intent);
     }

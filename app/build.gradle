@@ -17,6 +17,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    productFlavors {
+        Pro {
+            manifestPlaceholders = [YMANGU: "GooglePlay"]
+        }
+
+        Master {
+            manifestPlaceholders = [YMANGU: "Baidu"]
+        }
+
+        US {
+            manifestPlaceholders = [YMANGU: "Wandoujia"]
+        }
+    }
+
 }
 
 dependencies {
