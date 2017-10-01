@@ -1,0 +1,20 @@
+ext.versions = [
+        // 本地仓库版本
+]
+
+// app 相关信息总配置
+ext.appConfig = [
+        appmajor     : 1,
+        appminor     : 0,
+        appId        : 'com.smartahc.android.template.demo',
+        keyAlias     : 'template',
+        keyPassword  : 'template',
+        storeFile    : 'template.jks',
+        storePassword: 'template',
+        betaAPI      : 'http://beta.labelnet.cn',
+        betaName     : '@string/app_name',
+        betaLogo     : '@mipmap/ic_launcher_round',
+        proAPI       : 'http://pro.labelnet.cn',
+        proName      : '@string/app_name',
+        proLogo      : '@mipmap/ic_launcher',
+]

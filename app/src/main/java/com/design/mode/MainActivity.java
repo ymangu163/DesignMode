@@ -1,8 +1,10 @@
 package com.design.mode;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.common.activity.RecycleActivity;
+import com.common.utils.AppUtil;
 import com.design.mode.sectionone.activity.FacebookActivity;
 
 import java.util.Arrays;
@@ -24,11 +26,9 @@ public class MainActivity extends RecycleActivity {
             case 3:
 //                intent = new Intent(this, FrameActivity.class);
                 break;
-
-
-
         }
-        startActivity(intent);
+//        startActivity(intent);
+         Log.d("gao", AppUtil.getVersionName(this) + "  " + AppUtil.getVersionCode(this));
 
     }
 

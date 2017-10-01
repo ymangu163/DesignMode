@@ -1,53 +1,101 @@
 apply plugin: 'com.android.application'
+apply from: "$rootDir/config.gradle"
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
-    def currentVersionCode = getVersionCode()
-
-    //Git 中 commit 的数量来作为版本号（versionCode）
-//    def cmd = 'git rev-list HEAD --count'
-//    def gitVersion = cmd.execute().text.trim().toInteger()
 
     defaultConfig {
         applicationId "com.design.mode"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode currentVersionCode
-        versionName currentVersionName
+        versionCode getVersionCode(true)
+        versionName getVersionName(true)
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
+
+    // 签名 配置
+    signingConfigs {
+        debug {
+
+        }
         release {
+            keyAlias appConfig.keyAlias
+            keyPassword appConfig.keyPassword
+            storeFile file(appConfig.storeFile)
+            storePassword appConfig.storePassword
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            buildConfigField 'boolean', 'IS_DEBUG', 'true'
+            debuggable true
+            zipAlignEnabled true
             minifyEnabled false
+            shrinkResources false
+
+        }
+        release {
+            buildConfigField 'boolean', 'IS_DEBUG', 'false'
+            debuggable false
+            zipAlignEnabled true
+            minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
     productFlavors {
         Pro {
-            manifestPlaceholders = [YMANGU: "GooglePlay"]
+            buildConfigField "String", "API_BETA", "\"$appConfig.betaAPI\""
+            applicationId appConfig.appId + ".beta"
+            manifestPlaceholders = [APP_NAME: appConfig.betaName,
+                                    APP_LOGO: appConfig.betaLogo,
+                                    PACKAGE : appConfig.appId,
+                                    YMANGU: "GooglePlay"
+            ]
         }
 
         Master {
-            manifestPlaceholders = [YMANGU: "Baidu"]
+            manifestPlaceholders = [YMANGU: "Baidu",
+                                    APP_NAME: appConfig.betaName,
+                                    APP_LOGO: appConfig.betaLogo,
+                                    PACKAGE : appConfig.appId
+            ]
         }
 
         US {
-            manifestPlaceholders = [YMANGU: "Wandoujia"]
+            manifestPlaceholders = [YMANGU: "Wandoujia",
+                                    APP_NAME: appConfig.betaName,
+                                    APP_LOGO: appConfig.betaLogo,
+                                    PACKAGE : appConfig.appId
+            ]
         }
     }
 
+    //自定义apk安装包名
     applicationVariants.all { variant ->
-        if (variant.buildType.name.equals('release')) {
-            variant.mergedFlavor.versionCode = gitVersionCode()
-            variant.mergedFlavor.versionName = gitVersionTag()
+        variant.outputs.each { output ->
+            if (variant.buildType.name == 'release') {
+                variant.mergedFlavor.versionCode = getVersionCode(false)
+                variant.mergedFlavor.versionName = getVersionName(false)
+                // release
+                def apkName = "${project.getName()}_${variant.flavorName}_${buildType.name}_v${variant.versionCode}.apk";
+                output.outputFile = new File(output.outputFile.parent, apkName);
+            } else {
+                variant.mergedFlavor.versionCode = getVersionCode(true)
+                variant.mergedFlavor.versionName = getVersionName(true)
+                // debug
+                def apkName = "${project.getName()}_${buildType.name}.apk";
+                output.outputFile = new File(output.outputFile.parent, apkName);
+            }
         }
+
     }
-
 }
-
 tasks.whenTaskAdded { task ->
     if (task.name == 'assembleDebug') {
         task.doLast() {
@@ -62,61 +110,33 @@ dependencies {
     compile project(":libCommon")
 }
 
-def getVersionCode() {
-    def versionFile = file('version.properties')
-
-    if (versionFile.exists()) {
-        def Properties versionProps = new Properties()
-        versionProps.load(new FileInputStream(versionFile))
-        def versionCode = versionProps['build.number'].toInteger()
-        println('Current version code is ' + versionCode.toString())
-        return versionCode
-    } else {
-        throw new Exception("could not find version.properties!")
-    }
-}
-
-def updateVersionCode() {
-    def runTasks = gradle.startParameter.taskNames
-
-    if (!('assemble' in runTasks || 'assembleRelease' in runTasks || 'aR' in runTasks)) {
-//        return
-    }
-
-    def File versionFile = file('version.properties')
-    if (versionFile.exists()) {
-        def Properties versionProps = new Properties()
-        versionProps.load(new FileInputStream(versionFile))
-        def currentVersionCode = versionProps['build.number'].toInteger()
-        currentVersionCode++
-        versionProps['build.number'] = currentVersionCode.toString()
-        versionProps.store(versionFile.newWriter(), null)
-        println('Updated verion code to ' + currentVersionCode.toString())
-    } else {
-        throw new Exception("Could not find version.properties!")
-    }
-}
-
 //通过tag 自动命名VersionName
-def gitVersionTag() {
-    def cmd = 'git describe --tags'
+def getVersionName(boolean debug) {
+    def cmd = 'git for-each-ref  --sort=-taggerdate --format=\'%(refname)\' --count=1'
     def version = cmd.execute().text.trim()
 
-    def pattern = "-(\\d+)-g"
-    def matcher = version =~ pattern
-
-    if (matcher) {
-        version = version.substring(0, matcher.start()) + "." + matcher[0][1]
-    } else {
-        version = version + ".0"
+    def index = version.lastIndexOf("/")
+    if (index > 0) {
+        version = version.substring(index + 1, version.length() - 1)
     }
-
+    println("version = " + version.toString())
     return version
 }
 
+// 获取修订版本 git 提交次数
+static def getRevisionNumber() {
+    Process process = "git rev-list --count HEAD".execute()
+    process.waitFor()
+    return process.getText().toInteger()
+}
 
-
-
+// 获取 version code
+static def getVersionCode(boolean isDebug) {
+    if (isDebug) {
+        return Integer.parseInt(new Date().format("yyyyMMddHH"))
+    }
+    return getRevisionNumber()
+}
 
 
 
