@@ -3,12 +3,19 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
+
+    def currentVersionCode = getVersionCode()
+
+    //Git 中 commit 的数量来作为版本号（versionCode）
+//    def cmd = 'git rev-list HEAD --count'
+//    def gitVersion = cmd.execute().text.trim().toInteger()
+
     defaultConfig {
         applicationId "com.design.mode"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode currentVersionCode
+        versionName currentVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -32,6 +39,21 @@ android {
         }
     }
 
+    applicationVariants.all { variant ->
+        if (variant.buildType.name.equals('release')) {
+            variant.mergedFlavor.versionCode = gitVersionCode()
+            variant.mergedFlavor.versionName = gitVersionTag()
+        }
+    }
+
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'assembleDebug') {
+        task.doLast() {
+            updateVersionCode()
+        }
+    }
 }
 
 dependencies {
@@ -39,3 +61,68 @@ dependencies {
     compile "com.facebook.android:facebook-android-sdk:$rootProject.ext.facebookLibVersion"
     compile project(":libCommon")
 }
+
+def getVersionCode() {
+    def versionFile = file('version.properties')
+
+    if (versionFile.exists()) {
+        def Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionFile))
+        def versionCode = versionProps['build.number'].toInteger()
+        println('Current version code is ' + versionCode.toString())
+        return versionCode
+    } else {
+        throw new Exception("could not find version.properties!")
+    }
+}
+
+def updateVersionCode() {
+    def runTasks = gradle.startParameter.taskNames
+
+    if (!('assemble' in runTasks || 'assembleRelease' in runTasks || 'aR' in runTasks)) {
+//        return
+    }
+
+    def File versionFile = file('version.properties')
+    if (versionFile.exists()) {
+        def Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionFile))
+        def currentVersionCode = versionProps['build.number'].toInteger()
+        currentVersionCode++
+        versionProps['build.number'] = currentVersionCode.toString()
+        versionProps.store(versionFile.newWriter(), null)
+        println('Updated verion code to ' + currentVersionCode.toString())
+    } else {
+        throw new Exception("Could not find version.properties!")
+    }
+}
+
+//通过tag 自动命名VersionName
+def gitVersionTag() {
+    def cmd = 'git describe --tags'
+    def version = cmd.execute().text.trim()
+
+    def pattern = "-(\\d+)-g"
+    def matcher = version =~ pattern
+
+    if (matcher) {
+        version = version.substring(0, matcher.start()) + "." + matcher[0][1]
+    } else {
+        version = version + ".0"
+    }
+
+    return version
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
