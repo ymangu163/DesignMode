@@ -15,6 +15,7 @@
         <item>facebook分享</item>
         <item>facebook邀请</item>
         <item>facebook評星</item>
+        <item>SpanStringBuilder</item>
     </array>
 
     <array name="ui_array">
@@ -36,5 +37,5 @@
         <item>RxJava</item>
     </array>
 
-
+    <string name="privacy_policy_line">By tapping the button you agree to our Privacy Policy</string>
 </resources>

@@ -2,8 +2,11 @@ package com.design.mode.sectionone.activity;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
+import android.view.KeyEvent;
 
 import com.common.activity.RecycleActivity;
+import com.common.receiver.HomeReceiver;
 import com.common.utils.AppUtil;
 import com.design.mode.R;
 import com.facebook.appevents.AppEventsLogger;
@@ -12,6 +15,7 @@ import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.AppInviteDialog;
 import com.facebook.share.widget.ShareDialog;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -23,24 +27,33 @@ public class FacebookActivity extends RecycleActivity {
 
     @Override
     protected void handleClick(int position) {
+        Intent intent = null;
         switch (position) {
             case 0:
                 shareFacebook();
                 break;
             case 1:
                inviteFacebook();
+//                intent = new Intent(this, ImageActivity.class);
                 break;
             case 2:
                 likeFacebook(FacebookActivity.this.getString(R.string.facebook_app_page));
                 break;
             case 3:
-//                intent = new Intent(this, FrameActivity.class);
+                intent = new Intent(this, BillingActivity.class);
+//
+                try {
+                    Runtime.getRuntime().exec("input keyevent " + KeyEvent.KEYCODE_BACK);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 break;
 
-
-
         }
-
+        if (intent != null) {
+            startActivity(intent);
+        }
 
     }
 
@@ -82,5 +95,18 @@ public class FacebookActivity extends RecycleActivity {
         String[] array = getResources().getStringArray(R.array.facebook_array);
         mDatas = Arrays.asList(array);
         mAdapter.setDatas(mDatas);
+        HomeReceiver.regObserver(this, mHomeListener);
+    }
+    private HomeReceiver.IHomeListener mHomeListener = new HomeReceiver.IHomeListener() {
+        @Override
+        public void onHomePress() {
+            Log.e("gao", "home press");
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        HomeReceiver.unRegObserver(this, mHomeListener);
     }
 }

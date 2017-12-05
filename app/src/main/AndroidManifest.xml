@@ -17,6 +17,7 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </activity>
 
@@ -49,6 +50,16 @@
                 <data android:scheme="com.design.mode" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".sectionone.activity.BillingActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".sectionone.activity.ImageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".sectionone.activity.ImageActivity2"
+            android:screenOrientation="portrait" />
 
         <meta-data android:name="YMANGU" android:value="${YMANGU}"/>
 

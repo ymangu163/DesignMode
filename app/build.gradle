@@ -5,12 +5,12 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
-
+    def verCode = Integer.parseInt(new Date().format("yyyyMMddHH"))
     defaultConfig {
         applicationId "com.design.mode"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode getVersionCode(true)
+        versionCode verCode
         versionName getVersionName(true)
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -22,7 +22,7 @@ android {
         }
         release {
             keyAlias appConfig.keyAlias
-            keyPassword appConfig.keyPassword
+            keyPassword appConfig.keyPassword 
             storeFile file(appConfig.storeFile)
             storePassword appConfig.storePassword
         }
@@ -47,7 +47,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    flavorDimensions 'tier'
     productFlavors {
         Pro {
             buildConfigField "String", "API_BETA", "\"$appConfig.betaAPI\""
@@ -57,6 +57,7 @@ android {
                                     PACKAGE : appConfig.appId,
                                     YMANGU: "GooglePlay"
             ]
+            dimension 'tier'
         }
 
         Master {
@@ -65,6 +66,7 @@ android {
                                     APP_LOGO: appConfig.betaLogo,
                                     PACKAGE : appConfig.appId
             ]
+            dimension 'tier'
         }
 
         US {
@@ -73,24 +75,25 @@ android {
                                     APP_LOGO: appConfig.betaLogo,
                                     PACKAGE : appConfig.appId
             ]
+            dimension 'tier'
         }
     }
 
     //自定义apk安装包名
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
+        variant.outputs.all { output ->
             if (variant.buildType.name == 'release') {
-                variant.mergedFlavor.versionCode = getVersionCode(false)
-                variant.mergedFlavor.versionName = getVersionName(false)
+//                variant.mergedFlavor.versionCode = getVersionCode(false)
+//                variant.mergedFlavor.versionName = getVersionName(false)
                 // release
                 def apkName = "${project.getName()}_${variant.flavorName}_${buildType.name}_v${variant.versionCode}.apk";
-                output.outputFile = new File(output.outputFile.parent, apkName);
+                outputFileName = apkName;
             } else {
-                variant.mergedFlavor.versionCode = getVersionCode(true)
-                variant.mergedFlavor.versionName = getVersionName(true)
+//                variant.mergedFlavor.versionCode = getVersionCode(true)
+//                variant.mergedFlavor.versionName = getVersionName(true)
                 // debug
                 def apkName = "${project.getName()}_${buildType.name}.apk";
-                output.outputFile = new File(output.outputFile.parent, apkName);
+                outputFileName = apkName;
             }
         }
 

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.common.activity.RecycleActivity;
-import com.common.utils.AppUtil;
 import com.design.mode.sectionone.activity.FacebookActivity;
 
 import java.util.Arrays;
@@ -19,16 +18,17 @@ public class MainActivity extends RecycleActivity {
                 break;
             case 1:
 //                intent = new Intent(this, EncloseActivity.class);
+                doTest();
                 break;
             case 2:
-//                intent = new Intent(this, CustomActivity.class);
                 break;
             case 3:
 //                intent = new Intent(this, FrameActivity.class);
                 break;
         }
-//        startActivity(intent);
-         Log.d("gao", AppUtil.getVersionName(this) + "  " + AppUtil.getVersionCode(this));
+        if (intent != null) {
+            startActivity(intent);
+        }
 
     }
 
@@ -36,9 +36,37 @@ public class MainActivity extends RecycleActivity {
         String[] array = getResources().getStringArray(R.array.main);
         mDatas = Arrays.asList(array);
         mAdapter.setDatas(mDatas);
+
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.e("gao", "onPause");
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e("gao", "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("gao", "onDestroy");
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.e("gao", "onBackPressed");
+    }
+
+    private void doTest() {
+
+    }
 
 }
